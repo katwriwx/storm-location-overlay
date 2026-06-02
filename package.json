@@ -1,13 +1,13 @@
-{
-  "name": "chaser-hud-prototype",
-  "version": "1.0.0",
-  "description": "GPS to OBS overlay for storm chasing",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "dependencies": {
-    "axios": "^1.6.0",
-    "express": "^4.18.2"
-  }
-}
+app.post("/update-location", (req, res) => {
+  console.log("DATA RECEIVED:", req.body);
+
+  const lat = req.body.lat || req.body.latitude;
+  const lon = req.body.lon || req.body.longitude;
+
+  currentLocation = {
+    town: lat ? `LAT ${lat}` : "NO LAT",
+    state: lon ? `LON ${lon}` : "NO LON"
+  };
+
+  res.json(currentLocation);
+});
