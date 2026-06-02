@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      margin: 0;
+      background: transparent;
+      color: white;
+      font-size: 48px;
+      font-family: Arial;
+      text-shadow: 2px 2px 5px black;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="location">Loading...</div>
+
+  <script>
+    async function update() {
+      const res = await fetch("/current-location");
+      const data = await res.json();
+
+      document.getElementById("location").innerText =
+        `${data.town}, ${data.state}`;
+    }
+
+    update();
+    setInterval(update, 5000);
+  </script>
+</body>
+</html>
