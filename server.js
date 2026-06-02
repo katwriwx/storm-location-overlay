@@ -12,19 +12,19 @@ let currentLocation = {
 };
 
 // Receive GPS coordinates
-app.post("/update-location", async (req, res) => {
+app.post("/update-location", (req, res) => {
+  console.log("DATA RECEIVED:", req.body);
+
   const lat = req.body.lat || req.body.latitude;
   const lon = req.body.lon || req.body.longitude;
 
-  try {
-    const result = await axios.get(
-      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
-      {
-        headers: {
-          "User-Agent": "StormOverlay"
-        }
-      }
-    );
+  currentLocation = {
+    town: lat ? `LAT ${lat}` : "NO LAT",
+    state: lon ? `LON ${lon}` : "NO LON"
+  };
+
+  res.json(currentLocation);
+});
 
     const address = result.data.address;
 
