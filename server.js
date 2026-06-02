@@ -11,36 +11,63 @@ let currentLocation = {
   state: ""
 };
 
-// Receive GPS coordinates
-app.post("/update-location", (req, res) => {
+/**
+ * Receive GPS data from Traccar
+ */
+app.post("/update-location", async (req, res) => {
   console.log("DATA RECEIVED:", req.body);
 
   const lat = req.body.lat || req.body.latitude;
   const lon = req.body.lon || req.body.longitude;
 
-  currentLocation = {
-    town: lat ? `LAT ${lat}` : "NO LAT",
-    state: lon ? `LON ${lon}` : "NO LON"
-  };
+  if (!lat || !lon) {
+    return res.status(400).json({
+      error: "Missing lat/lon",
+      received: req.body
+    });
+  }
 
-  res.json(currentLocation);
-});
+  try {
+    // Reverse geocode (lat/lon → town/state)
+    const result = await axios.get(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
+      {
+        headers: {
+          "User-Agent": "StormOverlay"
+        }
+      }
+    );
 
-    const address = result.data.address;
+    const address = result.data.address || {};
 
     currentLocation = {
-      town: address.city || address.town || address.village || "Unknown",
+      town:
+        address.city ||
+        address.town ||
+        address.village ||
+        address.hamlet ||
+        "Unknown",
       state: address.state || ""
     };
 
     res.json(currentLocation);
 
   } catch (err) {
-    res.status(500).send("Error");
+    console.log("Geocode error:", err.message);
+
+    // fallback so overlay still works
+    currentLocation = {
+      town: `LAT ${lat}`,
+      state: `LON ${lon}`
+    };
+
+    res.json(currentLocation);
   }
 });
 
-// OBS reads this endpoint
+/**
+ * OBS overlay reads this
+ */
 app.get("/current-location", (req, res) => {
   res.json(currentLocation);
 });
@@ -48,5 +75,5 @@ app.get("/current-location", (req, res) => {
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`Running on ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
