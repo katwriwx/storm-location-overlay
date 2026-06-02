@@ -1,6 +1,7 @@
 {
-  "name": "storm-location-overlay",
+  "name": "chaser-hud-prototype",
   "version": "1.0.0",
+  "description": "GPS to OBS overlay for storm chasing",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
