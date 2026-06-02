@@ -13,7 +13,8 @@ let currentLocation = {
 
 // Receive GPS coordinates
 app.post("/update-location", async (req, res) => {
-  const { lat, lon } = req.body;
+  const lat = req.body.lat || req.body.latitude;
+  const lon = req.body.lon || req.body.longitude;
 
   try {
     const result = await axios.get(
